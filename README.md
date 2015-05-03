@@ -2,6 +2,8 @@
 
 Neurogaming Hackathon 2015 - Pacman Project
 
+Credits to [platzhersh](https://github.com/platzhersh) for [Pacman-Canvas](https://github.com/platzhersh/pacman-canvas).
+
 ![Pacman screenshot](http://i.imgur.com/DRaLWqM.png)
 
 ### Technologies
@@ -22,9 +24,8 @@ Initial Filtering with a Bessel Bandpass Filter (5 - 30 Hz), then goes through a
 Predictive Machine Learning Algorithm: Linear discriminant analysis (LDA), Training through calibration
 
 Credit to “Pacman Canvas” by Platzh1rsch
-SSVEP game controls
-Websocket payloads input
-Game controlled by flashing lights. Arrows indicate which direction. Flashing indicates the specified frequency associated with that direction
+
+SSVEP game controls, Websocket payloads input, Game controlled by flashing lights. Arrows indicate which direction. Flashing indicates the specified frequency associated with that direction
 
 
 ### Team
