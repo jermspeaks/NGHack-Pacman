@@ -747,7 +747,7 @@ function Pacman() {
   this.radius = 15;
   this.posX = 0;
   this.posY = 6 * 2 * this.radius;
-  this.speed = 5;
+  this.speed = 2;
   this.angle1 = 0.25;
   this.angle2 = 1.75;
   this.mouth = 1; /* Switches between 1 and -1, depending on mouth closing / opening */
@@ -822,10 +822,10 @@ function Pacman() {
         this.stuckY = this.dirY;
         pacman.stop();
         // get out of the wall
-        if ((this.stuckX == 1) && ((this.posX % 2 * this.radius) != 0)) this.posX -= 5;
-        if ((this.stuckY == 1) && ((this.posY % 2 * this.radius) != 0)) this.posY -= 5;
-        if (this.stuckX == -1) this.posX += 5;
-        if (this.stuckY == -1) this.posY += 5;
+        if ((this.stuckX == 1) && ((this.posX % 2 * this.radius) != 0)) this.posX -= this.speed;
+        if ((this.stuckY == 1) && ((this.posY % 2 * this.radius) != 0)) this.posY -= this.speed;
+        if (this.stuckX == -1) this.posX += this.speed;
+        if (this.stuckY == -1) this.posY += this.speed;
       }
 
     }
