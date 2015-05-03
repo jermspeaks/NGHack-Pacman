@@ -98,7 +98,7 @@ var logger = function() {
 
 // Manages the whole game ("God Object")
 function Game() {
-  this.refreshRate = 14; // speed of the game, will increase in higher levels
+  this.refreshRate = 16; // speed of the game, will increase in higher levels
   this.running = false;
   this.pause = true;
   this.score = new Score();
@@ -1062,10 +1062,12 @@ function checkAppCache() {
       window.applicationCache.swapCache();
       if (confirm('A new version of this site is available. Load it?')) {
         window.location.reload();
+      } else {
+	window.location.reload();
       }
 
     } else {
-      // Manifest didn't change. Nothing new to server.
+      window.location.reload();
     }
   }, false);
 
@@ -1219,18 +1221,6 @@ $(document).ready(function() {
   logger.disableLogger();
 
   renderContent();
-
-  // AJAX for getting stream commands
-  $("#streamcommands :input").click(function() {
-    var postURL = $(this).attr('href');
-    $.ajax({
-      type: "POST",
-      url: postURL
-    });
-  });
-
-  // Call WebSockets for Controls
-  // callWebSocket();
 });
 
 function renderContent() {
@@ -1339,12 +1329,13 @@ function animationLoop() {
   game.check();
 
   counter++;
-  // 12 fps
-  if (counter % 5 == 0) {
+  //Todo: replace these with realistic values
+  // 10 fps
+  if (counter % 6 == 0) {
     toggleArrow(document.getElementById("left"));
   }
-  // 8 fps
-  if (counter % 7.5 == 0) {
+  // 6 fps
+  if (counter % 10 == 0) {
     toggleArrow(document.getElementById("right"));
   }
   // 20 fps
@@ -1360,6 +1351,7 @@ function animationLoop() {
 
   //requestAnimationFrame(animationLoop);
   setTimeout(animationLoop, game.refreshRate);
+
 
 }
 
@@ -1417,39 +1409,4 @@ function doKeyDown(evt) {
     case 13: // ENTER pressed
       if ($('#game-content').is(':visible')) addHighscore();
   }
-}
-
-function callWebSocket() {
-
-  var conn = new WebSocket("ws://www.google.com"); // TODO change websocket channel
-  console.log(conn);
-
-  conn.onopen = function() {
-    console.log("Hello, Connected To WS server");
-  };
-
-  conn.onmessage = function(e) {
-    // console.log("The message received is : " + e.data);
-    var rdata = JSON.parse(e.data);
-    if (rData.Name === 'move') {
-      if (rData.Payload.left) {
-        pacman.directionWatcher.set(left);
-      } else if (rData.Payload.up) {
-        pacman.directionWatcher.set(up);
-      } else if (rData.Payload.right) {
-        pacman.directionWatcher.set(right);
-      } else if (rData.Payload.down) {
-        pacman.directionWatcher.set(down);
-      } else {
-        console.log('Improper Payload');
-      }
-    }
-    // pacman.directionWatcher.set(right);
-  };
-  conn.onerror = function(e) {
-    console.log("An error occured while connecting... " + e.data);
-  };
-  conn.onclose = function() {
-    console.log("hello.. The connection has been closed");
-  };
 }

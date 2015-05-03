@@ -98,7 +98,7 @@ var logger = function() {
 
 // Manages the whole game ("God Object")
 function Game() {
-  this.refreshRate = 16; // speed of the game, will increase in higher levels
+  this.refreshRate = 14; // speed of the game, will increase in higher levels
   this.running = false;
   this.pause = true;
   this.score = new Score();
@@ -262,7 +262,7 @@ function Game() {
 
     if (state == 0) {
       this.score.set(0);
-      this.score.refresh(".score");
+      //this.score.refresh(".score");
       pacman.lives = 3;
       game.level = 1;
       game.gameOver = false;
@@ -1216,9 +1216,21 @@ $(document).ready(function() {
     -------------------------------------------------------------------------- */
 
   game.init(0);
-  logger.disableLogger();
+  //logger.disableLogger();
 
   renderContent();
+
+  // AJAX for getting stream commands
+  $("#streamcommands :input").click(function() {
+    var postURL = $(this).attr('href');
+    $.ajax({
+      type: "POST",
+      url: postURL
+    });
+  });
+
+  // Call WebSockets for Controls
+  // callWebSocket();
 });
 
 function renderContent() {
@@ -1327,13 +1339,12 @@ function animationLoop() {
   game.check();
 
   counter++;
-  //Todo: replace these with realistic values
-  // 10 fps
-  if (counter % 6 == 0) {
+  // 12 fps
+  if (counter % 5 == 0) {
     toggleArrow(document.getElementById("left"));
   }
-  // 6 fps
-  if (counter % 10 == 0) {
+  // 8 fps
+  if (counter % 7.5 == 0) {
     toggleArrow(document.getElementById("right"));
   }
   // 20 fps
@@ -1349,7 +1360,6 @@ function animationLoop() {
 
   //requestAnimationFrame(animationLoop);
   setTimeout(animationLoop, game.refreshRate);
-
 
 }
 
@@ -1408,3 +1418,4 @@ function doKeyDown(evt) {
       if ($('#game-content').is(':visible')) addHighscore();
   }
 }
+
