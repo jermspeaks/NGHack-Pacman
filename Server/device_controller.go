@@ -210,6 +210,12 @@ func (mc *MindControl) sendPackets() {
 
 			if i%RawMsgSize == RawMsgSize-1 {
 				pbRaw.batch()
+				delete(pbRaw.Chans, "Chan3")
+				delete(pbRaw.Chans, "Chan4")
+				delete(pbRaw.Chans, "Chan5")
+				delete(pbRaw.Chans, "Chan6")
+				delete(pbRaw.Chans, "Chan7")
+				delete(pbRaw.Chans, "Chan8")
 				jsonPacket, err := json.Marshal(pbRaw.Chans)
 				_, err = mc.PredictionServerConn.Write(jsonPacket)
 				if err != nil {
@@ -245,16 +251,6 @@ func (mc *MindControl) sendPackets() {
 }
 
 func calcDirection(pred byte) (dir map[string][]float64) {
-	// left: 10hz
-	//   up: 20hz
-	//right:
-	// down:
-	/*
-		for i := 1; i <= channels; i++ {
-			fft := ffts["Chan"+strconv.Itoa(i)]
-		}
-	*/
-
 	dir = make(map[string][]float64)
 
 	switch pred {
