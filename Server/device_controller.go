@@ -160,7 +160,6 @@ func (mc *MindControl) sendPackets() {
 	var i int
 
 	FFTSize := 250
-	FFTFreq := 50
 
 	filterDesign, err := gofidlib.NewFilterDesign("BpBe4/5-30", samplesPerSecond)
 	if err != nil {
@@ -188,7 +187,7 @@ func (mc *MindControl) sendPackets() {
 			return
 		case arr := <-mc.deltaFFT:
 			FFTSize = arr[0]
-			FFTFreq = arr[1]
+			//FFTFreq = arr[1]
 			pbFFT = NewPacketBatcher(FFTSize)
 			i = 0
 		case p := <-mc.PacketChan:
@@ -210,12 +209,13 @@ func (mc *MindControl) sendPackets() {
 
 			if i%RawMsgSize == RawMsgSize-1 {
 				pbRaw.batch()
-				delete(pbRaw.Chans, "Chan3")
-				delete(pbRaw.Chans, "Chan4")
-				delete(pbRaw.Chans, "Chan5")
-				delete(pbRaw.Chans, "Chan6")
-				delete(pbRaw.Chans, "Chan7")
-				delete(pbRaw.Chans, "Chan8")
+				msg := pbRaw.Chans
+				delete(msg, "Chan3")
+				delete(msg, "Chan4")
+				delete(msg, "Chan5")
+				delete(msg, "Chan6")
+				delete(msg, "Chan7")
+				delete(msg, "Chan8")
 				jsonPacket, err := json.Marshal(pbRaw.Chans)
 				_, err = mc.PredictionServerConn.Write(jsonPacket)
 				if err != nil {
@@ -231,17 +231,6 @@ func (mc *MindControl) sendPackets() {
 				mc.broadcast <- newMessage("move", dir)
 
 				//mc.broadcast <- newMessage("raw", pbRaw.Chans)
-			}
-
-			if i > FFTSize && i%FFTFreq == FFTFreq-1 {
-				pbFFT.batch()
-				pbFFT.setFFT()
-				//direction := calcDirection(pbFFT.FFTs)
-				//mc.broadcast <- newMessage("move", direction)
-				//mc.broadcast <- newMessage("fft", pbFFT.FFTs)
-				binMsg := make(map[string][]float64)
-				binMsg["fftBins"] = calcFFTBins(FFTSize)
-				//mc.broadcast <- newMessage("fftBins", binMsg)
 			}
 
 			i++

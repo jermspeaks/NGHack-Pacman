@@ -51,12 +51,6 @@ func (pb *PacketBatcher) batch() {
 	for i, p := range pb.packets {
 		pb.Chans["Chan1"][i] = p.Chan1
 		pb.Chans["Chan2"][i] = p.Chan2
-		pb.Chans["Chan3"][i] = p.Chan3
-		pb.Chans["Chan4"][i] = p.Chan4
-		pb.Chans["Chan5"][i] = p.Chan5
-		pb.Chans["Chan6"][i] = p.Chan7
-		pb.Chans["Chan7"][i] = p.Chan7
-		pb.Chans["Chan8"][i] = p.Chan8
 	}
 	// pb.deleteEmptyChans()
 }
