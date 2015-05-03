@@ -269,6 +269,7 @@ func calcDirection(pred byte) (dir map[string][]float64) {
 	case '\x34':
 		dir["up"] = []float64{4.0}
 	}
+	log.Println(dir)
 	return dir
 }
 

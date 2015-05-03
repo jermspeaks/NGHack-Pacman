@@ -11,7 +11,7 @@ def makePrediction(data, m, hw, num_fft):
         c1 = c1 * hw
         c2 = data["Chan2"]
         c2 = c2 * hw
-        
+    
         fft1 = np.fft.fft(c1, num_fft)
         fft2 = np.fft.fft(c2, num_fft)
 
@@ -23,8 +23,9 @@ def makePrediction(data, m, hw, num_fft):
         features  = np.append(fft2pow, fft1pow)
 
         prediction = m.predict(features)
-    except:
-        prediction = [0]
+    except ValueError:
+        print data
+        return str(prediction[0])
     
     return str(prediction[0])
 
