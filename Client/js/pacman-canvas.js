@@ -1485,7 +1485,7 @@ function calibrationLoop() {
 
 function websocketInit() {
   if (window["WebSocket"]) {
-    fooconn = new WebSocket("ws://{{$}}/ws");
+    fooconn = new WebSocket("ws://localhost:8888/ws");
     fooconn.onclose = function(evt) {
       console.log("closing");
     }

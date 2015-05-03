@@ -5,25 +5,27 @@ import json
 import numpy as np
 
 def makePrediction(data, m, hw, num_fft):
-    data = json.loads(data)
-    c1 = data["Chan1"]
-    c1 = c1 * hw
-    c2 = data["Chan2"]
-    c2 = c2 * hw
+    try:
+        data = json.loads(data)
+        c1 = data["Chan1"]
+        c1 = c1 * hw
+        c2 = data["Chan2"]
+        c2 = c2 * hw
+        
+        fft1 = np.fft.fft(c1, num_fft)
+        fft2 = np.fft.fft(c2, num_fft)
+
+        fft1pow = np.absolute(fft1)/num_fft
+        fft1pow = fft1pow[:61]
+        fft2pow = np.absolute(fft2)/num_fft
+        fft2pow = fft2pow[:61]
+
+        features  = np.append(fft2pow, fft1pow)
+
+        prediction = m.predict(features)
+    except:
+        prediction = [0]
     
-    fft1 = np.fft.fft(c1, num_fft)
-    fft2 = np.fft.fft(c2, num_fft)
-
-    fft1pow = np.absolute(fft1)/num_fft
-    fft1pow = fft1pow[:61]
-    fft2pow = np.absolute(fft2)/num_fft
-    fft2pow = fft2pow[:61]
-
-    features  = np.append(fft2pow, fft1pow)
-
-    prediction = m.predict(features)
-    print prediction
-
     return str(prediction[0])
 
 def main():
@@ -35,8 +37,7 @@ def main():
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     # Bind the socket to the address given on the command line
-    server_name = sys.argv[1]
-    server_address = ("", 10000)
+    server_address = ("", 10001)
     print >>sys.stderr, 'starting up on %s port %s' % server_address
     sock.bind(server_address)
     sock.listen(1)

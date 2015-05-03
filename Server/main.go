@@ -55,7 +55,7 @@ func main() {
 		h.Close()
 	}()
 
-	predictionServerConn, err := net.Dial("tcp", "localhost:10000")
+	predictionServerConn, err := net.Dial("tcp", "localhost:10001")
 	if err != nil {
 		log.Fatalf("error connecting prediction server", err)
 	}
