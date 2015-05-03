@@ -23,7 +23,7 @@ var mapConfig = 'data/map.json';
 
 var calibrationRates = {
   first: 125, //8 fps
-  second: 100, // 10 fps
+  second: 50, // 20 fps
   third: 83, // 12 fps
   forth: 67 //15 fps
 };
@@ -1493,15 +1493,15 @@ function websocketInit() {
       foordata = JSON.parse(evt.data);
       if (foordata.Name == "move") {
         console.log(foordata.Payload);
-      }
-      if ("up" in foordata.Payload) {
-        pacman.directionWatcher.set(up);
-      } else if ("down" in foordata.Payload) {
-        pacman.directionWatcher.set(down);
-      } else if ("left" in foordata.Payload) {
-        pacman.directionWatcher.set(left);
-      } else if ("right" in foordata.Payload) {
-        pacman.directionWatcher.set(right);
+        if ("up" in foordata.Payload) {
+          pacman.directionWatcher.set(up);
+        } else if ("down" in foordata.Payload) {
+          pacman.directionWatcher.set(down);
+        } else if ("left" in foordata.Payload) {
+          pacman.directionWatcher.set(left);
+        } else if ("right" in foordata.Payload) {
+          pacman.directionWatcher.set(right);
+        }
       }
     }
     fooconn.onopen = function(evt) {
