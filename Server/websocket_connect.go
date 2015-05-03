@@ -66,7 +66,6 @@ func (ws *WSConn) write(mt int, payload []byte) error {
 }
 
 func (ws *WSConn) writeJSON(payload *message) error {
-	log.Printf("Writing message: %v", payload)
 	ws.wsConn.SetWriteDeadline(time.Now().Add(writeWait))
 	return ws.wsConn.WriteJSON(payload)
 }

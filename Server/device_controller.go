@@ -19,8 +19,10 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"io"
 	"log"
+	"net"
 	"os"
 	"time"
 
@@ -29,21 +31,22 @@ import (
 
 // MindControl ...
 type MindControl struct {
-	SerialDevice     io.ReadWriteCloser
-	PacketChan       chan *Packet
-	savePacketChan   chan *Packet
-	deltaFFT         chan [2]int
-	quitGenTest      chan bool
-	quitSendPackets  chan bool
-	quitSave         chan bool
-	quitDecodeStream chan bool
-	pauseRead        chan chan bool
-	gainC            chan *[8]float64
-	shutdown         chan bool
-	broadcast        chan *message
-	gain             [8]float64
-	saving           bool
-	genTesting       bool
+	SerialDevice         io.ReadWriteCloser
+	PredictionServerConn net.Conn
+	PacketChan           chan *Packet
+	savePacketChan       chan *Packet
+	deltaFFT             chan [2]int
+	quitGenTest          chan bool
+	quitSendPackets      chan bool
+	quitSave             chan bool
+	quitDecodeStream     chan bool
+	pauseRead            chan chan bool
+	gainC                chan *[8]float64
+	shutdown             chan bool
+	broadcast            chan *message
+	gain                 [8]float64
+	saving               bool
+	genTesting           bool
 }
 
 // NewMindControl ...
@@ -205,18 +208,30 @@ func (mc *MindControl) sendPackets() {
 			pbFFT.packets[i%FFTSize] = p
 			pbRaw.packets[i%RawMsgSize] = p
 
-			/*
-				if i%RawMsgSize == RawMsgSize-1 {
-					pbRaw.batch()
-					mc.broadcast <- newMessage("raw", pbRaw.Chans)
+			if i%RawMsgSize == RawMsgSize-1 {
+				pbRaw.batch()
+				jsonPacket, err := json.Marshal(pbRaw.Chans)
+				_, err = mc.PredictionServerConn.Write(jsonPacket)
+				if err != nil {
+					log.Println("Error writing to prediction server", err)
 				}
-			*/
+				pred := make([]byte, 1)
+				_, err = mc.PredictionServerConn.Read(pred)
+				if err != nil {
+					log.Println("Error reading from prediction server", err)
+				}
+
+				dir := calcDirection(pred[0])
+				mc.broadcast <- newMessage("move", dir)
+
+				//mc.broadcast <- newMessage("raw", pbRaw.Chans)
+			}
 
 			if i > FFTSize && i%FFTFreq == FFTFreq-1 {
 				pbFFT.batch()
 				pbFFT.setFFT()
-				direction := calcDirection(pbFFT.FFTs)
-				mc.broadcast <- newMessage("move", direction)
+				//direction := calcDirection(pbFFT.FFTs)
+				//mc.broadcast <- newMessage("move", direction)
 				//mc.broadcast <- newMessage("fft", pbFFT.FFTs)
 				binMsg := make(map[string][]float64)
 				binMsg["fftBins"] = calcFFTBins(FFTSize)
@@ -229,7 +244,7 @@ func (mc *MindControl) sendPackets() {
 	}
 }
 
-func calcDirection(ffts map[string][]float64) (dir map[string][]float64) {
+func calcDirection(pred byte) (dir map[string][]float64) {
 	// left: 10hz
 	//   up: 20hz
 	//right:
@@ -241,7 +256,19 @@ func calcDirection(ffts map[string][]float64) (dir map[string][]float64) {
 	*/
 
 	dir = make(map[string][]float64)
-	dir["up"] = []float64{1.0}
+
+	switch pred {
+	case '\x30':
+		dir["none"] = []float64{0.0}
+	case '\x31':
+		dir["right"] = []float64{1.0}
+	case '\x32':
+		dir["left"] = []float64{2.0}
+	case '\x33':
+		dir["down"] = []float64{3.0}
+	case '\x34':
+		dir["up"] = []float64{4.0}
+	}
 	return dir
 }
 

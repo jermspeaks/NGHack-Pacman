@@ -21,6 +21,7 @@ package main
 import (
 	"flag"
 	"log"
+	"net"
 	"net/http"
 	"time"
 
@@ -36,7 +37,7 @@ const (
 	channels         = 8
 	samplesPerSecond = 250
 	readBufferSize   = 1024 * 1024
-	RawMsgSize       = 30
+	RawMsgSize       = 250
 )
 
 func main() {
@@ -54,8 +55,15 @@ func main() {
 		h.Close()
 	}()
 
+	predictionServerConn, err := net.Dial("tcp", "localhost:10000")
+	if err != nil {
+		log.Fatalf("error connecting prediction server", err)
+	}
+
 	shutdown := make(chan bool, 1)
 	mc := NewMindControl(h.broadcast, shutdown, device)
+	mc.PredictionServerConn = predictionServerConn
+
 	handle := NewHandle(mc)
 
 	http.HandleFunc("/ws", h.wsPacketHandler)
@@ -93,4 +101,5 @@ func main() {
 		}
 	}
 	run(shutdown)
+
 }
