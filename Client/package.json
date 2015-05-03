@@ -1,0 +1,24 @@
+{
+  "name": "pacman-canvas",
+  "version": "1.0.0",
+  "description": "pacman-canvas =============",
+  "main": "pacman-canvas.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jermspeaks/pacman-canvas.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jermspeaks/pacman-canvas/issues"
+  },
+  "homepage": "https://github.com/jermspeaks/pacman-canvas",
+  "devDependencies": {
+    "gulp": "^3.8.11",
+    "gulp-develop-server": "^0.4.2",
+    "gulp-livereload": "^3.8.0"
+  }
+}
