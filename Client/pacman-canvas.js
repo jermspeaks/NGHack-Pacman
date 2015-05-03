@@ -1102,7 +1102,7 @@ $(document).ready(function() {
   // Hide address bar
   hideAdressbar();
 
-  if (window.applicationCache != null) checkAppCache();
+  // if (window.applicationCache != null) checkAppCache();
 
   /* -------------------- EVENT LISTENERS -------------------------- */
 
@@ -1417,39 +1417,4 @@ function doKeyDown(evt) {
     case 13: // ENTER pressed
       if ($('#game-content').is(':visible')) addHighscore();
   }
-}
-
-function callWebSocket() {
-
-  var conn = new WebSocket("ws://www.google.com"); // TODO change websocket channel
-  console.log(conn);
-
-  conn.onopen = function() {
-    console.log("Hello, Connected To WS server");
-  };
-
-  conn.onmessage = function(e) {
-    // console.log("The message received is : " + e.data);
-    var rdata = JSON.parse(e.data);
-    if (rData.Name === 'move') {
-      if (rData.Payload.left) {
-        pacman.directionWatcher.set(left);
-      } else if (rData.Payload.up) {
-        pacman.directionWatcher.set(up);
-      } else if (rData.Payload.right) {
-        pacman.directionWatcher.set(right);
-      } else if (rData.Payload.down) {
-        pacman.directionWatcher.set(down);
-      } else {
-        console.log('Improper Payload');
-      }
-    }
-    // pacman.directionWatcher.set(right);
-  };
-  conn.onerror = function(e) {
-    console.log("An error occured while connecting... " + e.data);
-  };
-  conn.onclose = function() {
-    console.log("hello.. The connection has been closed");
-  };
 }
