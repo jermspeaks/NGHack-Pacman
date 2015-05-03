@@ -216,7 +216,7 @@ func (mc *MindControl) sendPackets() {
 				delete(msg, "Chan6")
 				delete(msg, "Chan7")
 				delete(msg, "Chan8")
-				jsonPacket, err := json.Marshal(pbRaw.Chans)
+				jsonPacket, err := json.Marshal(msg)
 				_, err = mc.PredictionServerConn.Write(jsonPacket)
 				if err != nil {
 					log.Println("Error writing to prediction server", err)
@@ -228,6 +228,7 @@ func (mc *MindControl) sendPackets() {
 				}
 
 				dir := calcDirection(pred[0])
+				log.Printf("Direction == %v\n", dir)
 				mc.broadcast <- newMessage("move", dir)
 
 				//mc.broadcast <- newMessage("raw", pbRaw.Chans)

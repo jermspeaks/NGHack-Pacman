@@ -42,7 +42,7 @@ def main():
     print >>sys.stderr, 'starting up on %s port %s' % server_address
     sock.bind(server_address)
     sock.listen(1)
-    f = open('./lda_clf2')
+    f = open('./lda_clf')
 
     while True:
         print >>sys.stderr, 'waiting for a connection'
