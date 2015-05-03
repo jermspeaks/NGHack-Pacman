@@ -21,7 +21,14 @@ var inky, blinky, clyde, pinky;
 
 var mapConfig = 'data/map.json';
 
-var calibrationRefreshRate = 100;
+var calibrationRates = {
+  first: 125, //8 fps
+  second: 100, // 10 fps
+  third: 83, // 12 fps
+  forth: 67 //15 fps
+};
+
+var calibrationRefreshRate = calibrationRates.first;
 var calibrationElementId = 'first-calibration-block';
 /* AJAX stuff */
 function getHighscore() {
@@ -388,7 +395,7 @@ function Ghost(name, gridPosX, gridPosY, image, gridBaseX, gridBaseY) {
   this.startPosY = gridPosY * 30;
   this.gridBaseX = gridBaseX;
   this.gridBaseY = gridBaseY;
-  this.speed = 5;
+  this.speed = 1;
   this.images = JSON.parse(
     '{"normal" : {' + '"inky" : "0",' + '"pinky" : "1",' + '"blinky" : "2",' + '"clyde" : "3"' + '},' +
     '"frightened1" : {' +
@@ -403,7 +410,7 @@ function Ghost(name, gridPosX, gridPosY, image, gridBaseX, gridBaseY) {
   this.ghostHouse = true;
   this.dazzled = false;
   this.dazzle = function() {
-    this.changeSpeed(3);
+    // this.changeSpeed(3);
     // ensure ghost doesnt leave grid
     if (this.posX > 0) this.posX = this.posX - this.posX % this.speed;
     if (this.posY > 0) this.posY = this.posY - this.posY % this.speed;
@@ -411,7 +418,7 @@ function Ghost(name, gridPosX, gridPosY, image, gridBaseX, gridBaseY) {
   }
   this.undazzle = function() {
     // only change speed if ghost is not "dead"
-    if (!this.dead) this.changeSpeed(3);
+    // if (!this.dead) this.changeSpeed(3);
     // ensure ghost doesnt leave grid
     if (this.posX > 0) this.posX = this.posX - this.posX % this.speed;
     if (this.posY > 0) this.posY = this.posY - this.posY % this.speed;
@@ -454,7 +461,7 @@ function Ghost(name, gridPosX, gridPosY, image, gridBaseX, gridBaseY) {
   this.die = function() {
     //this.reset();
     this.dead = true;
-    this.changeSpeed(5);
+    // this.changeSpeed(5);
   }
   this.changeSpeed = function(s) {
     // adjust gridPosition to new speed
@@ -736,7 +743,7 @@ function Figure() {
   }
 }
 
-function pacman() {
+function Pacman() {
   this.radius = 15;
   this.posX = 0;
   this.posY = 6 * 2 * this.radius;
@@ -978,8 +985,8 @@ function pacman() {
     return (this.posY - (this.posY % 30)) / 30;
   }
 }
-pacman.prototype = new Figure();
-var pacman = new pacman();
+Pacman.prototype = new Figure();
+var pacman = new Pacman();
 
 /* ------------ Start Pre-Build Walls  ------------ */
 canvas_walls = document.createElement('canvas');
@@ -1226,6 +1233,7 @@ $(document).ready(function() {
 
   game.init(0);
   //logger.disableLogger();
+  websocketInit();
 
   renderContent();
 
@@ -1431,25 +1439,34 @@ function doKeyDown(evt) {
 function secondPanel() {
   $('#first-calibration').remove();
   $('#second-calibration').show();
-  calibrationRefreshRate = 110;
-  calibrationElementId = 'second-calibration-block';
-  calibrationLoop();
+  setTimeout(function() {
+    calibrationRefreshRate = calibrationRates.second;
+    calibrationElementId = 'second-calibration-block';
+    console.log(calibrationRefreshRate);
+    calibrationLoop();
+  }, 1000);
 }
 
 function thirdPanel() {
   $('#second-calibration').remove();
   $('#third-calibration').show();
-  calibrationRefreshRate = 50;
-  calibrationElementId = 'third-calibration-block';
-  calibrationLoop();
+  setTimeout(function() {
+    calibrationRefreshRate = calibrationRates.third;
+    calibrationElementId = 'third-calibration-block';
+    console.log(calibrationRefreshRate);
+    calibrationLoop();
+  }, 1000);
 }
 
 function lastPanel() {
   $('#third-calibration').remove();
   $('#forth-calibration').show();
-  calibrationRefreshRate = 150;
-  calibrationElementId = 'forth-calibration-block';
-  calibrationLoop();
+  setTimeout(function() {
+    calibrationRefreshRate = calibrationRates.forth;
+    console.log(calibrationRefreshRate);
+    calibrationElementId = 'forth-calibration-block';
+    calibrationLoop();
+  }, 1000);
 }
 
 function startGame() {
@@ -1459,9 +1476,42 @@ function startGame() {
 }
 
 function calibrationLoop() {
-  var element = document.getElementById(calibrationElementId) ;
+  var element = document.getElementById(calibrationElementId);
   if (element) {
     toggleArrow(element); // Same function for arrows
     setTimeout(calibrationLoop, calibrationRefreshRate);
   }
+}
+
+function websocketInit() {
+  if (window["WebSocket"]) {
+    fooconn = new WebSocket("ws://{{$}}/ws");
+    fooconn.onclose = function(evt) {
+      console.log("closing");
+    }
+    fooconn.onmessage = function(evt) {
+      foordata = JSON.parse(evt.data);
+      if (foordata.Name == "move") {
+        console.log(foordata.Payload);
+      }
+      if ("up" in foordata.Payload) {
+        pacman.directionWatcher.set(up);
+      } else if ("down" in foordata.Payload) {
+        pacman.directionWatcher.set(down);
+      } else if ("left" in foordata.Payload) {
+        pacman.directionWatcher.set(left);
+      } else if ("right" in foordata.Payload) {
+        pacman.directionWatcher.set(right);
+      }
+    }
+    fooconn.onopen = function(evt) {
+      console.log("opening");
+    }
+  } else {
+    appendLog($("<div><b>Your browser does not support WebSockets.</b></div>"));
+  }
+  $(window).on('beforeunload', function() {
+    console.log("Closing websocket");
+    fooconn.close();
+  });
 }
