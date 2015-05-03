@@ -263,9 +263,9 @@ func calcDirection(pred byte) (dir map[string][]float64) {
 	case '\x31':
 		dir["right"] = []float64{1.0}
 	case '\x32':
-		dir["left"] = []float64{2.0}
+		dir["down"] = []float64{2.0}
 	case '\x33':
-		dir["down"] = []float64{3.0}
+		dir["left"] = []float64{3.0}
 	case '\x34':
 		dir["up"] = []float64{4.0}
 	}
