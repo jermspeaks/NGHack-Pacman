@@ -21,7 +21,8 @@ var inky, blinky, clyde, pinky;
 
 var mapConfig = 'data/map.json';
 
-
+var calibrationRefreshRate = 100;
+var calibrationElementId = 'first-calibration-block';
 /* AJAX stuff */
 function getHighscore() {
   setTimeout(ajax_get, 30);
@@ -1102,7 +1103,15 @@ $(document).ready(function() {
   // Hide address bar
   hideAdressbar();
 
-  // if (window.applicationCache != null) checkAppCache();
+  // Calibration
+  $('.container').hide();
+  $('#second-calibration').hide();
+  $('#third-calibration').hide();
+  $('#forth-calibration').hide();
+
+  calibrationLoop('first-calibration-block', 10);
+
+  if (window.applicationCache != null) checkAppCache();
 
   /* -------------------- EVENT LISTENERS -------------------------- */
 
@@ -1416,5 +1425,43 @@ function doKeyDown(evt) {
       break;
     case 13: // ENTER pressed
       if ($('#game-content').is(':visible')) addHighscore();
+  }
+}
+
+function secondPanel() {
+  $('#first-calibration').remove();
+  $('#second-calibration').show();
+  calibrationRefreshRate = 110;
+  calibrationElementId = 'second-calibration-block';
+  calibrationLoop();
+}
+
+function thirdPanel() {
+  $('#second-calibration').remove();
+  $('#third-calibration').show();
+  calibrationRefreshRate = 50;
+  calibrationElementId = 'third-calibration-block';
+  calibrationLoop();
+}
+
+function lastPanel() {
+  $('#third-calibration').remove();
+  $('#forth-calibration').show();
+  calibrationRefreshRate = 150;
+  calibrationElementId = 'forth-calibration-block';
+  calibrationLoop();
+}
+
+function startGame() {
+  $('#first-calibration').remove();
+  $('.calibration').remove();
+  $('.container').show();
+}
+
+function calibrationLoop() {
+  var element = document.getElementById(calibrationElementId) ;
+  if (element) {
+    toggleArrow(element); // Same function for arrows
+    setTimeout(calibrationLoop, calibrationRefreshRate);
   }
 }
