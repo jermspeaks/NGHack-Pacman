@@ -8,7 +8,7 @@ CACHE:
 # CSS pacman-canvas.css
 
 # external resources
-css/style.css
+style.css
 img/bg-pattern-black.png
 
 # fonts
