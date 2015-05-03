@@ -1358,7 +1358,7 @@ function animationLoop() {
   counter++;
   // 12 fps
   if (counter % 5 == 0) {
-    toggleArrow(document.getElementById("left"));
+    toggleArrow(document.getElementById("down"));
   }
   // 8 fps
   if (counter % 7.5 == 0) {
@@ -1371,7 +1371,7 @@ function animationLoop() {
 
   // 15 fps
   if (counter % 4 == 0) {
-    toggleArrow(document.getElementById("down"));
+    toggleArrow(document.getElementById("left"));
   }
 
 
