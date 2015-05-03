@@ -50,15 +50,16 @@ func main() {
 	if err != nil {
 		log.Fatalf("error opening device: %s\n", err)
 	}
-	defer func() {
-		device.Close()
-		h.Close()
-	}()
-
-	predictionServerConn, err := net.Dial("tcp", "localhost:10001")
+	predictionServerConn, err := net.Dial("tcp", "localhost:10002")
 	if err != nil {
 		log.Fatalf("error connecting prediction server", err)
 	}
+
+	defer func() {
+		device.Close()
+		h.Close()
+		predictionServerConn.Close()
+	}()
 
 	shutdown := make(chan bool, 1)
 	mc := NewMindControl(h.broadcast, shutdown, device)
